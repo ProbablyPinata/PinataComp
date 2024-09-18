@@ -22,7 +22,9 @@ public:
     //==============================================================================
     // Custom:
     
-    float gain = 1.0f;
+    float ratio = 1.0f;
+    float threshold = 0.01f;
+    std::string h = "init";
 
     //==============================================================================
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;

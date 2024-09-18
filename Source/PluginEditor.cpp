@@ -23,7 +23,7 @@ PinataCompAudioProcessorEditor::PinataCompAudioProcessorEditor (PinataCompAudioP
     midiVolume.setTextBoxStyle (juce::Slider::NoTextBox, false, 90, 0);
     midiVolume.setPopupDisplayEnabled (true, false, this);
     midiVolume.setTextValueSuffix (" Volume");
-    midiVolume.setValue(p.gain);
+    midiVolume.setValue(p.ratio);
  
     // this function adds the slider to the editor
     addAndMakeVisible (&midiVolume);
@@ -50,8 +50,9 @@ void PinataCompAudioProcessorEditor::paint (juce::Graphics& g)
     // set the font size and draw text to the screen
     g.setFont (15.0f);
  
-    g.drawFittedText ("Volume Utility", 0, 0, getWidth(), 30, juce::Justification::centred, 1);
-    
+//    g.drawFittedText ("Volume Utility", 0, 0, getWidth(), 30, juce::Justification::centred, 1);
+    g.drawFittedText (audioProcessor.h, 0, 0, getWidth(), 30, juce::Justification::centred, 1);
+
     
 }
 
@@ -65,5 +66,5 @@ void PinataCompAudioProcessorEditor::resized()
 
 void PinataCompAudioProcessorEditor::sliderValueChanged (juce::Slider* slider)
 {
-    audioProcessor.gain = midiVolume.getValue();
+    audioProcessor.ratio = midiVolume.getValue();
 }

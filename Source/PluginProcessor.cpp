@@ -1,25 +1,27 @@
 /*
-  ==============================================================================
+   ==============================================================================
 
-    This file contains the basic framework code for a JUCE plugin processor.
+   This file contains the basic framework code for a JUCE plugin processor.
 
-  ==============================================================================
-*/
+   ==============================================================================
+   */
 
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
+#include <fstream>
+#include <cmath>
 
 //==============================================================================
 PinataCompAudioProcessor::PinataCompAudioProcessor()
 #ifndef JucePlugin_PreferredChannelConfigurations
-     : AudioProcessor (BusesProperties()
-                     #if ! JucePlugin_IsMidiEffect
-                      #if ! JucePlugin_IsSynth
-                       .withInput  ("Input",  juce::AudioChannelSet::stereo(), true)
-                      #endif
-                       .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
-                     #endif
-                       )
+    : AudioProcessor (BusesProperties()
+#if ! JucePlugin_IsMidiEffect
+#if ! JucePlugin_IsSynth
+            .withInput  ("Input",  juce::AudioChannelSet::stereo(), true)
+#endif
+            .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
+#endif
+            )
 #endif
 {
 }
@@ -36,29 +38,29 @@ const juce::String PinataCompAudioProcessor::getName() const
 
 bool PinataCompAudioProcessor::acceptsMidi() const
 {
-   #if JucePlugin_WantsMidiInput
+#if JucePlugin_WantsMidiInput
     return true;
-   #else
+#else
     return false;
-   #endif
+#endif
 }
 
 bool PinataCompAudioProcessor::producesMidi() const
 {
-   #if JucePlugin_ProducesMidiOutput
+#if JucePlugin_ProducesMidiOutput
     return true;
-   #else
+#else
     return false;
-   #endif
+#endif
 }
 
 bool PinataCompAudioProcessor::isMidiEffect() const
 {
-   #if JucePlugin_IsMidiEffect
+#if JucePlugin_IsMidiEffect
     return true;
-   #else
+#else
     return false;
-   #endif
+#endif
 }
 
 double PinataCompAudioProcessor::getTailLengthSeconds() const
@@ -106,26 +108,26 @@ void PinataCompAudioProcessor::releaseResources()
 #ifndef JucePlugin_PreferredChannelConfigurations
 bool PinataCompAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
 {
-  #if JucePlugin_IsMidiEffect
+#if JucePlugin_IsMidiEffect
     juce::ignoreUnused (layouts);
     return true;
-  #else
+#else
     // This is the place where you check if the layout is supported.
     // In this template code we only support mono or stereo.
     // Some plugin hosts, such as certain GarageBand versions, will only
     // load plugins that support stereo bus layouts.
     if (layouts.getMainOutputChannelSet() != juce::AudioChannelSet::mono()
-     && layouts.getMainOutputChannelSet() != juce::AudioChannelSet::stereo())
+            && layouts.getMainOutputChannelSet() != juce::AudioChannelSet::stereo())
         return false;
 
     // This checks if the input layout matches the output layout
-   #if ! JucePlugin_IsSynth
+#if ! JucePlugin_IsSynth
     if (layouts.getMainOutputChannelSet() != layouts.getMainInputChannelSet())
         return false;
-   #endif
+#endif
 
     return true;
-  #endif
+#endif
 }
 #endif
 
@@ -154,13 +156,24 @@ void PinataCompAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
     {
         auto* channelData = buffer.getWritePointer (channel);
 
-        // ..do something to the data...
+        // gain is non-negative
         for (int sample = 0; sample < buffer.getNumSamples(); ++sample)
         {
-            
-            channelData[sample] *= gain;  // Apply the volume change
+            if (channelData[sample] > 0.01f) {
+                channelData[sample] = 0.01f + (channelData[sample]-0.01f)*ratio;
+            } else if (channelData[sample] < -0.01f) {
+                channelData[sample] = -0.01f + (channelData[sample]+0.01f)*ratio; // not sure about this one
+            }
+            /*else {*/
+            /*    channelData[sample] *= 2; // make quiet sounds louder*/
+            /*}*/
         }
     }
+    // first sample of first channell is written to file
+    //    std::ofstream outfile;
+    //    outfile.open("/Users/stefan/samples.txt", std::ios_base::app);
+    //    outfile << std::to_string(buffer.getWritePointer(0)[0]);
+    //    outfile.close();
 }
 
 //==============================================================================

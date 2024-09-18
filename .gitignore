@@ -2,5 +2,5 @@
 # Macos 
 .DS_STORE
 
-
+.idea/
 Builds/
