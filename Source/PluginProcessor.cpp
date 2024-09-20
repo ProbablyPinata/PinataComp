@@ -162,11 +162,8 @@ void PinataCompAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
             if (channelData[sample] > 0.01f) {
                 channelData[sample] = 0.01f + (channelData[sample]-0.01f)*ratio;
             } else if (channelData[sample] < -0.01f) {
-                channelData[sample] = -0.01f + (channelData[sample]+0.01f)*ratio; // not sure about this one
+                channelData[sample] = -0.01f + (channelData[sample]+0.01f)*ratio;
             }
-            /*else {*/
-            /*    channelData[sample] *= 2; // make quiet sounds louder*/
-            /*}*/
         }
     }
     // first sample of first channell is written to file
